@@ -19,4 +19,6 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^tree/', include('tree.urls')),
     url(r'^node/', include('node.urls')),
+    url(r'^bite/', include('bite.urls')),
+    url(r'^core/', include('core.urls')),
 ]

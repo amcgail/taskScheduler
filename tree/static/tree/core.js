@@ -1,3 +1,7 @@
+var awaitingInput = false;
+var awaitingInputCallback = null;
+var byid = {}
+
 function round(value, decimals) {
     return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
 }
@@ -8,6 +12,8 @@ function node( info ) {
     this.info = info;
     this.children = [];
     this.parents = [];
+
+    byid[ this.info.id ] = this;
 
     this.amt_actual = 0;
 
@@ -31,6 +37,12 @@ node.prototype.render = function() {
 
     var $expandcontract = $("<div class='button expandcontract small'>").appendTo($html);
     $expandcontract.click( function() {
+        // This is where we receive input, i.e. when rebasing a task
+        if( awaitingInput ) {
+            awaitingInputCallback( _this.info.id );
+            awaitingInput = false;
+            return;
+        }
         toggle_children();
     } );
     var $cm_button = $("<div class='button cm'>").appendTo($html);
@@ -49,6 +61,18 @@ node.prototype.render = function() {
         _this.sendinfotoserver();
         $title.html( _this.info.title );
     } )
+
+
+
+    this.$amt_used = $("<div class='amt used'>").appendTo( $html );
+    this.$amt_used.update = function() {
+        var used = _this.getsumrealreal();
+        if ( used == 0 )
+            _this.$amt_used.html( "" );
+        else
+            _this.$amt_used.html( used + " hours" );
+    }
+    this.$amt_used.update();
 
 
 
@@ -73,10 +97,17 @@ node.prototype.render = function() {
 
             newamt = round(hours,2);
         }
-        _this.info.amt = newamt;
+        _this.info.amt = parseFloat(newamt);
         _this.sendinfotoserver();
         $amt_budget.update();
-        $amt_sum.update();
+
+        //Update all the parents
+        var parent = _this;
+        while( typeof parent != 'undefined' ) {
+            parent.$amt_sum.update();
+            //Will break for multiple parents...
+            parent = parent.parents[0];
+        }
     } )
 
 
@@ -88,19 +119,19 @@ node.prototype.render = function() {
     //$amt_sum.update();
 
 
-    var $amt_sum = $("<div class='amt'>").appendTo( $html );
+    this.$amt_sum = $("<div class='amt'>").appendTo( $html );
 
-    $amt_sum.update = function() {
+    this.$amt_sum.update = function() {
         var sum = 0;
         for( var i in _this.children )
             sum += _this.children[i].getsumreal()
 
         if (sum == 0)
-            $amt_sum.html( "" );
+            _this.$amt_sum.html( "" );
         else
-            $amt_sum.html( sum + " hours");
+            _this.$amt_sum.html( sum + " hours");
     }
-    $amt_sum.update();
+    this.$amt_sum.update();
 
 
 
@@ -174,6 +205,45 @@ node.prototype.render = function() {
             render_children();
         } );
 
+        new_button( "move me", function() {
+            awaitingInput = true;
+            awaitingInputCallback = function( id ) {
+                _this.info.parent = id;
+                _this.sendinfotoserver();
+
+                _this.parents[0].removechild( _this.info.id )
+                byid[id].addchild( new node( _this.info ) )
+
+                for( var i in byid[id].renderings )
+                    byid[id].renderings[i].render_children()
+            }
+        } );
+
+        new_button( "move my time", function() {
+            awaitingInput = true;
+            awaitingInputCallback = function( id ) {
+                $.ajax( {
+                    "method": "POST",
+                    "url": "/node/movetime",
+                    "data": {
+                        "from":_this.info.id,
+                        "to": id
+                    },
+                    "success": function(e) {
+                        byid[id].info.used += _this.info.used;
+                        _this.info.used = 0;
+
+                        _this.$amt_used.update();
+                        byid[id].$amt_used.update();
+                    }
+                } )
+            }
+        } );
+
+        new_button( "doing now", function() {
+            timer.start( _this.info );
+        } );
+
         new_button( "zoom", function() {
             window.location = "/tree/" + _this.info.id
         });
@@ -228,6 +298,13 @@ node.prototype.getsumreal = function() {
         sum += this.children[i].getsumreal();
     };
     return sum;
+}
+
+node.prototype.getsumrealreal = function() {
+    var mine = this.info.used / 3600;
+    for( var i in this.children )
+        mine += this.children[i].getsumrealreal();
+    return round(mine, 2);
 }
 
 node.prototype.sendinfotoserver = function() {

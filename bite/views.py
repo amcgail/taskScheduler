@@ -4,33 +4,38 @@ from django.shortcuts import render
 
 from core.models import Task
 from django.http import HttpResponse
+from core import get_info_onlyparents
 
 
-def update(request):
+def home(request):
     import json
-    info = json.loads( request.POST['info'] )
-    toupdate = Task.objects.get( id=info['id'] )
-    toupdate.title = info['title']
-    toupdate.estimated_time = info['amt']
-    toupdate.save()
-    return HttpResponse("1")
 
-def delete(request):
-    todelete = Task.objects.get( id=request.POST['id'] )
-    todelete.delete()
-    return HttpResponse( "1" )
+    cando = Task.objects.filter( estimated_time__lte = 2 ).filter( estimated_time__gt = 0 )
 
+    info = []
+    for o in cando:
+        info.append( get_info_onlyparents( o ) )
+    info = sorted( info, key=lambda x: x['amt'] )
+    info = json.dumps(info)
 
-def addchild(request):
-    import json
-    from core.models import Task
+    html = "<body></body>"
+    html += "<script>info=%s;</script>" % (info)
 
-    info = json.loads(request.POST['info'])
-    parent = request.POST['parent']
+    scripts = [
+        "/static/jquery.min.js",
+        "/static/bite/core.js",
+        "/static/timer.js",
+    ]
 
-    newChild = Task(
-        title=info['title'],
-        parent=Task.objects.get( id=parent )
-    )
-    newChild.save()
-    return HttpResponse( newChild.id )
+    css = [
+        "/static/bite/core.css",
+        "/static/core.css",
+        "/static/timer.css"
+    ]
+
+    for s in scripts:
+        html += "<script type='text/javascript' src='%s'></script>" % s
+    for s in css:
+        html += "<link href='%s' rel='stylesheet'/>" % s
+
+    return HttpResponse(html)

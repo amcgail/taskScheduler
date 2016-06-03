@@ -1,0 +1,41 @@
+.timer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    box-sizing: border-box;
+    background-color: white;
+    border-top: 1px solid;
+    display: none;
+    background-color: #DDD;
+}
+
+.timer .title {
+    font-weight: bold;
+}
+
+.timer .time {
+    font-size: 40px;
+}
+
+.timer .time.budget {
+    color: orange;
+    font-size: 20px;
+}
+
+.timer .links {
+    border-bottom: 1px solid;
+    text-align: left;
+}
+
+.timer .links .link {
+    cursor: pointer;
+    font-size: 12px;
+    display: inline-block;
+    padding: 5px;
+}
+
+.timer .links .link:hover {
+    background-color: white;
+}

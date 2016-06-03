@@ -4,36 +4,11 @@ from django.http import response
 from core.models import Task
 from django.http import HttpResponse
 
+from core import get_info, getparents
+
 
 def home(request):
     return HttpResponse( "<a href='tree'>Tree</a>" )
-
-
-def get_info( me ):
-    children = Task.objects.filter( parent=me )
-
-    jc = []
-    for c in children:
-        jc.append( get_info(c) )
-
-    return {
-        "id": me.id,
-        "title": me.title,
-        "amt": me.estimated_time,
-        "children": jc
-    }
-
-
-def getparents( obj ):
-    me = {
-        "id": obj.id,
-        "title": obj.title
-    }
-    if obj.parent_id is None:
-        return [me]
-
-    mydad = Task.objects.get( id=obj.parent_id )
-    return [me] + getparents(mydad)
 
 
 # Create your views here.
@@ -53,10 +28,18 @@ def core(request, id):
     scripts = [
         "/static/jquery.min.js",
         "/static/tree/core.js",
+        "/static/timer.js",
     ]
+
+    css = [
+        "/static/tree/core.css",
+        "/static/core.css",
+        "/static/timer.css"
+    ]
+
     for s in scripts:
         html += "<script type='text/javascript' src='%s'></script>" % s
-
-    html += "<link href='/static/tree/core.css' rel='stylesheet'/>"
+    for s in css:
+        html += "<link href='%s' rel='stylesheet'/>" % s
 
     return HttpResponse( html )
