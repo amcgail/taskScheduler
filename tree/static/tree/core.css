@@ -1,0 +1,81 @@
+.expandcontract.small { background-color: black; }
+.expandcontract.big { background-color: #CCC; }
+.cm.button { background-color: blue; }
+.zoom.button { background-color: magenta; }
+
+.button {
+    width: 10px;
+    height: 10px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.title {
+    display: inline-block;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.amt {
+    display: inline-block;
+    font-weight: bold;
+    margin-left: 5px;
+    float: right;
+}
+.amt.budget {
+    color: orange;
+    cursor: pointer;
+}
+
+.children {
+    margin-left: 25px;
+    display: none;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px
+}
+
+.node {
+    border-width: 1px 0;
+    border-style: solid;
+    border-color: white;
+}
+.node:hover {
+    border-color: black;
+}
+
+.newchild {
+    cursor: pointer;
+}
+
+.context_menu {
+    left: 22px;
+    top: 16px;
+    border: solid;
+    border-width: 1px 1px 0;
+    width: 100px;
+    position: absolute;
+    background-color: #DDD;
+}
+
+.context_menu .item {
+    padding: 5px;
+    border-bottom: 1px solid;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.context_menu .item:hover {
+    background-color: #EEE;
+}
+
+.parent {
+    margin-right: 10px;
+    color: black;
+}
+
+.heading {
+    margin-bottom: 10px;
+    border-bottom: 1px solid;
+    padding-bottom: 10px;
+}

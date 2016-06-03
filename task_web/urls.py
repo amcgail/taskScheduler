@@ -16,8 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
-import views
-
 urlpatterns = [
-    url(r'^.*$', views.core),
+    url(r'^tree/', include('tree.urls')),
+    url(r'^node/', include('node.urls')),
 ]
