@@ -7,16 +7,17 @@
     box-sizing: border-box;
     background-color: white;
     border-top: 1px solid;
-    display: none;
     background-color: #DDD;
 }
 
 .timer .title {
     font-weight: bold;
+    display: none;
 }
 
 .timer .time {
     font-size: 40px;
+    display: none;
 }
 
 .timer .time.budget {

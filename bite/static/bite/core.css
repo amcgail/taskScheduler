@@ -8,12 +8,17 @@
     display: inline;
     font-size: 12px;
     color: #888;
+    cursor: pointer;
 }
 
-
-.amt.budget {
-    color: orange;
+.parent:hover {
+    color: #626;
+}
+.amt {
     display: inline-block;
     font-weight: bold;
     margin-left: 5px;
 }
+.amt.budget {color: orange;}
+
+.amt.used {color: red;}

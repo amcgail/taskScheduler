@@ -3,7 +3,7 @@ var awaitingInputCallback = null;
 var byid = {}
 
 function round(value, decimals) {
-    return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+    return value.toFixed( decimals );//Number(Math.round(value+'e'+decimals)+'e-'+decimals);
 }
 
 function node( info ) {
@@ -45,6 +45,8 @@ node.prototype.render = function() {
         }
         toggle_children();
     } );
+    $expandcontract.toggleClass( "haschildren", (this.children.length > 0));
+
     var $cm_button = $("<div class='button cm'>").appendTo($html);
     $cm_button.on("click", function(e) {
         set_context_menu(e);
@@ -64,17 +66,37 @@ node.prototype.render = function() {
 
 
 
+    this.$amt_used_day = $("<div class='amt used'>").appendTo( $html );
+    this.$amt_used_day.update = function() {
+        var used = _this.getsumrealreal_day();
+        if ( used == 0 )
+            _this.$amt_used_day.html( "" );
+        else
+            _this.$amt_used_day.html( round(used,2) );
+    }
+    this.$amt_used_day.update();
+
+
+    this.$amt_used_week = $("<div class='amt used'>").appendTo( $html );
+    this.$amt_used_week.update = function() {
+        var used = _this.getsumrealreal_week();
+        if ( used == 0 )
+            _this.$amt_used_week.html( "" );
+        else
+            _this.$amt_used_week.html( round(used,2) );
+    }
+    this.$amt_used_week.update();
+
+
     this.$amt_used = $("<div class='amt used'>").appendTo( $html );
     this.$amt_used.update = function() {
         var used = _this.getsumrealreal();
         if ( used == 0 )
             _this.$amt_used.html( "" );
         else
-            _this.$amt_used.html( used + " hours" );
+            _this.$amt_used.html( round(used,2) );
     }
     this.$amt_used.update();
-
-
 
     var $amt_budget = $("<div class='amt budget'>").appendTo( $html );
 
@@ -83,7 +105,7 @@ node.prototype.render = function() {
         this.info.amt = 0
 
     $amt_budget.update = function() {
-        $amt_budget.html( _this.info.amt + " hours" );
+        $amt_budget.html( _this.info.amt  );
     }
     $amt_budget.update();
     $amt_budget.click( function() {
@@ -129,7 +151,7 @@ node.prototype.render = function() {
         if (sum == 0)
             _this.$amt_sum.html( "" );
         else
-            _this.$amt_sum.html( sum + " hours");
+            _this.$amt_sum.html( round(sum,2));
     }
     this.$amt_sum.update();
 
@@ -164,118 +186,7 @@ node.prototype.render = function() {
             $children.append( _this.children[i].render() );
     }
 
-    set_context_menu = function(e) {
-        $context_menu = $("<div class='context_menu'>").appendTo( "body" );
-        $context_menu.css( {
-            "left": e.pageX,
-            "top": e.pageY
-        } );
-
-        var new_button = function( name, fn ) {
-            $btn = $("<div class='item'>").appendTo( $context_menu );
-            $btn.html( name );
-            $btn.click( function() {
-                unset_context_menu();
-                fn();
-            } );
-        }
-
-        new_button( "new child", function() {
-            var title = prompt( "Enter title please" );
-            if( title == null ) return;
-
-            var newchild = new node( {
-                "children": [],
-                "title": title
-            } );
-
-            $.ajax( {
-                "data": {
-                    "info": JSON.stringify( newchild.info ),
-                    "parent": _this.info.id
-                },
-                "url": "/node/addchild",
-                "method": "POST",
-                "success": function( resp ) {
-                    newchild.info.id = parseInt(resp);
-                }
-            } );
-
-            _this.addchild( newchild );
-            render_children();
-        } );
-
-        new_button( "move me", function() {
-            awaitingInput = true;
-            awaitingInputCallback = function( id ) {
-                _this.info.parent = id;
-                _this.sendinfotoserver();
-
-                _this.parents[0].removechild( _this.info.id )
-                byid[id].addchild( new node( _this.info ) )
-
-                for( var i in byid[id].renderings )
-                    byid[id].renderings[i].render_children()
-            }
-        } );
-
-        new_button( "move my time", function() {
-            awaitingInput = true;
-            awaitingInputCallback = function( id ) {
-                $.ajax( {
-                    "method": "POST",
-                    "url": "/node/movetime",
-                    "data": {
-                        "from":_this.info.id,
-                        "to": id
-                    },
-                    "success": function(e) {
-                        byid[id].info.used += _this.info.used;
-                        _this.info.used = 0;
-
-                        _this.$amt_used.update();
-                        byid[id].$amt_used.update();
-                    }
-                } )
-            }
-        } );
-
-        new_button( "doing now", function() {
-            timer.start( _this.info );
-        } );
-
-        new_button( "zoom", function() {
-            window.location = "/tree/" + _this.info.id
-        });
-
-
-        new_button( "delete", function() {
-            if( !confirm( "Are you sure??" ) ) return;
-            $.ajax( {
-                "method": "POST",
-                "url": "/node/delete",
-                "data": {"id":_this.info.id},
-                "success": function(e) {
-                    for( var i in _this.parents ) {
-                        _this.parents[i].removechild( _this.info.id )
-                    }
-                    render_children();
-                }
-            } )
-        } );
-
-
-        new_button( "close", function() {
-        } );
-
-        $cm_button.off( "click" )
-        $cm_button.on( "click", unset_context_menu );
-    }
-
-    unset_context_menu = function(e) {
-        $context_menu.remove();
-        $cm_button.on( "click.cm", set_context_menu );
-    }
+    set_context_menu = cmfn(this, $cm_button, render_children);
 
     render_children();
     if( localStorage[ "toggle:" + _this.info.id ] == "true" )
@@ -283,7 +194,8 @@ node.prototype.render = function() {
 
     this.renderings.push( {
         html:$html,
-        render_children:render_children
+        render_children:render_children,
+        $expandcontract:$expandcontract
     } );
 
     return $html
@@ -304,7 +216,21 @@ node.prototype.getsumrealreal = function() {
     var mine = this.info.used / 3600;
     for( var i in this.children )
         mine += this.children[i].getsumrealreal();
-    return round(mine, 2);
+    return mine;
+}
+
+node.prototype.getsumrealreal_week = function() {
+    var mine = this.info.used_week / 3600;
+    for( var i in this.children )
+        mine += this.children[i].getsumrealreal_week();
+    return mine;
+}
+
+node.prototype.getsumrealreal_day = function() {
+    var mine = this.info.used_day / 3600;
+    for( var i in this.children )
+        mine += this.children[i].getsumrealreal_day();
+    return mine;
 }
 
 node.prototype.sendinfotoserver = function() {
@@ -327,25 +253,42 @@ node.prototype.removechild = function( childid ) {
     for( var i in todelete )
         this.children.splice( todelete[i], 1 );
 
-    for( var i in this.renderings )
-        this.renderings[i].render_children()
+    for( var i in this.renderings ) {
+        this.renderings[i].render_children();
+        this.renderings[i].$expandcontract.toggleClass( "haschildren", (this.children.length > 0));
+    }
 }
 
 node.prototype.addchild = function( newchild ) {
     this.children.push( newchild );
     newchild.parents.push( this );
+
+    for( var i in this.renderings ) {
+        this.renderings[i].render_children();
+        this.renderings[i].$expandcontract.toggleClass( "haschildren", (this.children.length > 0));
+    }
 }
 
 $(document).ready( function() {
     $heading = $("<div class='heading'>").appendTo( $("body") );
     for( var i=parents.length-1; i>=0; i-- ) {
         $( "<a class='parent'>" )
-            .html( parents[i].title )
+            .html( parents[i].title + "  >" )
             .attr( "href", "/tree/" + parents[i].id )
             .appendTo( $heading );
     }
 
     $cont = $("<div>").appendTo( $("body") );
+
+    //First so it's above everything
+    $cont.append(
+        $("<div class='amtrule a'>"),
+        $("<div class='amtrule b'>"),
+        $("<div class='amtrule c'>"),
+        $("<div class='amtrule d'>"),
+        $("<div class='amtrule e'>")
+    )
+
     var root = new node(info);
     $cont.append( root.render() );
 } );

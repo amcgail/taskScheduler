@@ -30,7 +30,7 @@ def home(request):
     css = [
         "/static/bite/core.css",
         "/static/core.css",
-        "/static/timer.css"
+        "/static/timer.css",
     ]
 
     for s in scripts:

@@ -25,7 +25,10 @@ def core(request, id):
 
     html += "<script>info=%s;parents=%s;</script>" % (info,parents)
 
+    html += "<title>%s</title>" % Task.objects.get( id=int(id) ).title
+
     scripts = [
+        "/static/cm.js",
         "/static/jquery.min.js",
         "/static/tree/core.js",
         "/static/timer.js",

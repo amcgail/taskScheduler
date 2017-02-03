@@ -21,4 +21,7 @@ urlpatterns = [
     url(r'^node/', include('node.urls')),
     url(r'^bite/', include('bite.urls')),
     url(r'^core/', include('core.urls')),
+    url(r'^recent/', include('recent.urls')),
+    url(r'^quicklists/', include('quicklists.urls')),
+    url(r'^schedule/', include('schedule.urls')),
 ]

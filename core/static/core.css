@@ -1,3 +1,7 @@
+body {
+    margin: 0;
+}
+
 .expandcontract.small { background-color: black; }
 .expandcontract.big { background-color: #CCC; }
 .cm.button { background-color: blue; }

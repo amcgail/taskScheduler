@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'core',
     'tree',
     'node',
-    'bite'
+    'bite',
+    'schedule',
+    'quicklists'
 ]
 
 MIDDLEWARE_CLASSES = [
