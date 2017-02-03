@@ -1,0 +1,36 @@
+body {
+    margin: 0;
+}
+
+.expandcontract.small { background-color: black; }
+.expandcontract.big { background-color: #CCC; }
+.cm.button { background-color: blue; }
+.zoom.button { background-color: magenta; }
+
+.button {
+    width: 10px;
+    height: 10px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.context_menu {
+    left: 22px;
+    top: 16px;
+    border: solid;
+    border-width: 1px 1px 0;
+    width: 100px;
+    position: absolute;
+    background-color: #DDD;
+}
+
+.context_menu .item {
+    padding: 5px;
+    border-bottom: 1px solid;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.context_menu .item:hover {
+    background-color: #EEE;
+}

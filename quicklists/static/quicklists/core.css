@@ -1,0 +1,96 @@
+
+.title {
+    display: inline-block;
+    font-weight: bold;
+    margin-left: 5px;
+    line-height: 20px;
+    height: 20px;
+}
+
+.expandcontract.small.haschildren {
+    border: 4px solid;
+    background-color: white;
+    height: 2px;
+    width: 2px;
+}
+
+.amt {
+    display: inline-block;
+    font-weight: bold;
+    margin-left: 5px;
+    float: right;
+    width: 24px;
+    font-size: 10px;
+    min-height: 1px;
+    text-align: right;
+    padding-right: 5px;
+    line-height: 20px;
+}
+.amt.budget {
+    color: orange;
+    cursor: pointer;
+}
+.amt.used {
+    color: red;
+}
+.amtrule {
+    position: fixed;
+    height: 100%;
+    top: 0;
+    width: 33px;
+    border-left: 1px solid;
+    z-index: -1;
+}
+.amtrule.a {
+    right: 0;
+}
+.amtrule.b {
+    right: 33px;
+}
+.amtrule.c {
+    right: 66px;
+}
+.amtrule.d {
+    right: 99;
+}
+.amtrule.e {
+    right: 132px;
+}
+
+
+.children {
+    margin-left: 25px;
+    display: none;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px
+}
+
+.node {
+    border-width: 1px 0;
+    border-style: solid;
+    border-color: transparent;
+}
+.node:hover {
+    border-color: black;
+}
+
+.newchild {
+    cursor: pointer;
+}
+
+.parent {
+    text-decoration: none;
+    margin-right: 10px;
+    color: white;
+}
+
+.timer .parent {
+    display: inline-block;
+    color: #777;
+}
+
+.heading {
+    background-color: black;
+    margin-bottom: 10px;
+}
