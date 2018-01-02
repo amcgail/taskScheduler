@@ -4,9 +4,15 @@ def getcurrenttime(request):
     import json, datetime
     from core.models import TimeTrack2
     import core
+    from datetime import datetime
+
+    nw = datetime.now()
 
     noend = TimeTrack2.objects.filter( end=None )
     if noend.count() > 1:
+        for o in noend:
+            o.end = nw
+            o.save()
         return HttpResponse( "ERROR: MORE THAN ONE RUNNING")
 
     if noend.count() == 0:
