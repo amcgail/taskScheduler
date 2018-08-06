@@ -1,8 +1,7 @@
 # Installation
 
-You must install django==1.9 for this guy to work.
-
-Should add a requirements file... duh
+`pip install -r requirements.txt
+python manage.py runserver`
 
 # About
 
