@@ -1,3 +1,11 @@
+# Installation
+
+You must install django==1.9 for this guy to work.
+
+Should add a requirements file... duh
+
+# About
+
 Custom built, hierarchical task scheduler.
 I built this because no tools out there quite did what I want.
 
